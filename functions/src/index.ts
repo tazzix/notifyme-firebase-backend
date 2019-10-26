@@ -1,4 +1,15 @@
 import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+
+import firebaseAccountCredentials from './serviceaccount.json'
+const serviceAccount = firebaseAccountCredentials as admin.ServiceAccount
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://tazzixcom.firebaseio.com"
+});
+
+const fcm = admin.messaging();
 
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
@@ -7,7 +18,29 @@ export const helloWorld = functions.https.onRequest((request, response) => {
  response.send("Hello from Firebase!");
 });
 
+export const sendNotification = functions.firestore.document('/users/{infoId}')
+.onWrite(async (change, context) => {
+    const infoId = context.params.infoId; console.info('Info:'+infoId);
+    const payload = {
+        notification: {
+            title: 'New Message from',
+            body: 'New Message Body',
+            status: 'Wohoo its work'
+            //click_action: 'https://testing-project-development.firebaseapp.com'
+        }
+    }
 
+    console.info(payload);
+
+    //const data = await admin.firestore.document(`/users/${change.after}`).once('value');
+    //if (!data.val()) return;
+    //console.info(JSON.stringify(data.val()));
+    //return;
+    
+    //const snapshot = data.val();
+    const token = 'dQ24QIz3Ob_aP3RE3gZ9vQ:APA91bFIrqZ5LxLNBS447Ra0T88xk58lRL5Z3H1NTRo2IzkyS_Hswr_g_Un3TZmK9KI-dM7twi1IsLqolrtdSzqIHkpqkSij60_m_4SFG9AYYNVauDctl3fGdoCbpbAwT8viNnNiIxP6';//snapshot.token;
+    return fcm.sendToDevice(token, payload);
+});
 
 
 
