@@ -1,3 +1,165 @@
+//========================================================================================
+// == Service Worker registration for PWA
+//========================================================================================
+
+const registerSw = () => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js', {
+          scope: '/' // <--- THIS BIT IS REQUIRED
+      }).then(function(registration) {
+          // Registration was successful
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+          // registration failed :(
+          console.log('ServiceWorker registration failed: ', err);
+      });
+    }
+  };
+  
+//========================================================================================
+// == Code for soft keys
+//========================================================================================
+
+const getCurrentElement = () => document.querySelector("[nav-selected=true]");
+
+const Enter = event => {
+};
+
+const SoftRight = event => {
+  // TODO: implement refresh 1. clear list, 2. get data from db / cache, 3. populate new data
+  console.log("Todo Refresh!");
+};
+
+const SoftLeft = event => {
+};
+
+const setLabels = ({ left, center, right }) => {
+  document.getElementById("left").innerHTML = left ? left : "";
+  document.getElementById("center").innerHTML = center ? center : "";
+  document.getElementById("right").innerHTML = right ? right : "";
+};
+
+
+//========================================================================================
+// == Code for navigation using D-pad
+//========================================================================================
+
+(() => {
+  const firstElement = document.querySelectorAll("[nav-selectable]")[0];
+  firstElement.setAttribute("nav-selected", "true");
+  firstElement.setAttribute("nav-index", "0");
+  firstElement.focus();
+})();
+
+const getAllElements = () => document.querySelectorAll("[nav-selectable]");
+
+const getTheIndexOfTheSelectedElement = () => {
+  const element = document.querySelector("[nav-selected=true]");
+  return element ? parseInt(element.getAttribute("nav-index"), 10) : 0;
+};
+
+const selectElement = selectElement =>
+  [].forEach.call(getAllElements(), (element, index) => {
+    const selectThisElement = element === selectElement;
+    element.setAttribute("nav-selected", selectThisElement);
+    element.setAttribute("nav-index", index);
+    if (element.nodeName === 'INPUT') {
+      if (selectThisElement) element.focus(); else element.blur();
+    }
+  });
+
+const Navigate = (direction, event) => {
+  const allElements = getAllElements();
+  const currentIndex = getTheIndexOfTheSelectedElement();
+  var setIndex;
+
+  switch(direction) {
+    case "DOWN":
+      const goToFirstElement = currentIndex + 1 > allElements.length - 1;
+      setIndex = goToFirstElement ? 0 : currentIndex + 1;
+      break;
+    case "UP":
+      const goToLastElement = currentIndex === 0;
+      setIndex = goToLastElement ? allElements.length - 1 : currentIndex - 1;
+      break;
+    default:
+      break;
+  }
+
+  selectElement(allElements[setIndex] || allElements[0]);
+  setSoftkey(setIndex);
+
+  const element = document.querySelector("[nav-selected=true]");
+  //element.scrollIntoView(false);
+  scrollToElement(element);
+};
+
+function scrollToElement(element) {
+  // skip for header (or other non-scrolling elements in future)
+  if (parseInt(element.getAttribute("nav-index"), 10) == 0) return;
+
+  var rect = element.getBoundingClientRect();
+
+  if (rect.top < 50) { // header is 50px height at this time
+    let moveUp = rect.top - 54; // header + padding at this time
+    document.querySelector("#main-content").scrollBy({
+      top: moveUp
+    });
+  }
+
+  if (rect.bottom > (window.innerHeight-30)) { // 30px is the height of softkey bar (footer) at this time
+    let moveDown = rect.bottom - window.innerHeight + 36;
+    document.querySelector("#main-content").scrollBy({
+      top: moveDown
+    });
+  }
+}
+
+const setSoftkey = setIndex => {}
+  /*setLabels({
+    center: setIndex === 0 ? "" : "",
+    right: setIndex === 0 ? "Refresh" : "Refresh"
+  });*/
+
+
+//========================================================================================
+// == Code for application logo
+//========================================================================================
+
+  // Adds a new item to the todo list
+function addItemToDOM(text) {
+    var list = document.getElementById('notifications');
+    var item = document.createElement('li');
+    item.innerHTML = text;
+    item.setAttribute("nav-selectable", "true");  
+    list.insertBefore(item, list.childNodes[0]);
+  }
+
+//========================================================================================
+// == Key handling on keyboard
+//========================================================================================
+
+document.addEventListener("keydown", event => {
+    switch (event.key) {
+      case "Enter":
+      case "NumpadEnter":
+        return Enter(event);
+      case "ArrowDown":
+        return Navigate("DOWN", event);
+      case "ArrowUp":
+        return Navigate("UP", event);
+      //case "ArrowRight": // TODO: for use on buggy emulator, could be a good idea to remove after testing
+      case "SoftRight":
+        return SoftRight(event);
+      default:
+        return;
+    }
+  });
+  
+//========================================================================================
+// == Code from sample / push notification
+//========================================================================================
+
 document.addEventListener('DOMContentLoaded', function() {
     // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
     // // The Firebase SDK is initialized and available here!
@@ -79,8 +241,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     } catch (e) {
       console.error(e);
-      document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+      //document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
     }
+
+    addItemToDOM('A list item');
+    addItemToDOM('A list item');
+    addItemToDOM('A list item');
+    addItemToDOM('A list item');
+    addItemToDOM('A list item');
+    addItemToDOM('A list item');
   });
 
 

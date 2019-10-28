@@ -1,0 +1,22 @@
+{
+    "name": "Notify Me",
+    "description": "Notification Mirror - From Android to PWA (special KaiOS Support)",
+    "short_name": "NotifyMe",
+    "theme_color": "#2962ff",
+    "background_color": "#2962ff",
+    "display": "standalone",
+    "Scope": "/",
+    "start_url": "/",
+    "icons": [
+        {
+          "src": "images/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ],
+    "splash_pages": null,
+    "developer": {
+        "name": "tazzix",
+        "url": "https://github.com/tazzix/"
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "NotifyMe",
+  "description": "Notification Mirror - From Android to PWA (special KaiOS Support)",
+  "launch_path": "/index.html",
+  "icons": {
+    "192": "/images/icon-192x192.png"
+  },
+  "developer": {
+    "name": "tazzix",
+    "url": "https://github.com/tazzix/"
+  }
+}
