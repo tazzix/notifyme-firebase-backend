@@ -5,6 +5,7 @@ console.log('... Service Worker File Running ...');
 const cacheName = 'notifymepwa-v1';
 const staticAssets = [
 '/',
+'/images/icon-192x192.png',
 '/css/reset.min.css',
 '/css/style.css',
 '/css/softkey.css',
@@ -61,6 +62,7 @@ self.addEventListener('push', function (event) {
   console.log(notification)
   var title = notification.title || 'Yay a message.';
   var body = notification.body || 'We have received a push message.';
+  var click_action = notification.click_action;
   var icon = '/images/icon-192x192.png';
   // var tag = 'simple-push-demo-notification-tag';
 
@@ -68,35 +70,35 @@ self.addEventListener('push', function (event) {
     self.registration.showNotification(title, {
       body: body,
       icon: icon,
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: 1,
+        redirectUrl : click_action
+      },
+      timeout : 1000
       // tag: tag
     })
   );
-
 });
 
 // on Notification Click do whatever you want...
-self.addEventListener('notificationclick', function (event) {
-  
+self.addEventListener('notificationclick', function(event) {
+  var url = event.notification.data.redirectUrl;
   console.log('On notification click: ', event.notification);
   // Android doesn’t close the notification when you click on it
   // See: http://crbug.com/463146
   event.notification.close();
-
-  // This looks to see if the current is already open and
-  // focuses if it is
-  event.waitUntil(clients.matchAll({
-    type: 'window'
-  }).then(function (clientList) {
-    for (var i = 0; i < clientList.length; i++) {
-      var client = clientList[i];
-      if (client.url === '/' && 'focus' in client) {
-        return client.focus();
-      }
-    }
-    if (clients.openWindow) {
-      return clients.openWindow('/');
-    }
-  }));
-
-});
-
+  event.waitUntil(
+          clients.matchAll({includeUncontrolled: true, type: 'window'}).then( windowClients => {
+          for (var i = 0; i < windowClients.length; i++) {
+              var client = windowClients[i];
+              if (client.url === url && 'focus' in client) {
+                  return client.focus();
+              }
+          }
+          if (clients.openWindow) {
+              return clients.openWindow(url);
+          }
+      })
+  );
+}); 

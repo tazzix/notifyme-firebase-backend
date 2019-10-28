@@ -25,8 +25,8 @@ export const sendNotification = functions.firestore.document('/users/{infoId}')
         notification: {
             title: 'New Message from',
             body: 'New Message Body',
-            status: 'Wohoo its work'
-            //click_action: 'https://testing-project-development.firebaseapp.com'
+            status: 'Wohoo its work',
+            click_action: 'http://127.0.0.1:5000/'
         }
     }
 
@@ -38,7 +38,7 @@ export const sendNotification = functions.firestore.document('/users/{infoId}')
     //return;
     
     //const snapshot = data.val();
-    const token = 'dQ24QIz3Ob_aP3RE3gZ9vQ:APA91bFIrqZ5LxLNBS447Ra0T88xk58lRL5Z3H1NTRo2IzkyS_Hswr_g_Un3TZmK9KI-dM7twi1IsLqolrtdSzqIHkpqkSij60_m_4SFG9AYYNVauDctl3fGdoCbpbAwT8viNnNiIxP6';//snapshot.token;
+    const token = 'chMYKkbxngBn0BrHSO7zxN:APA91bFayPomT7TMquJ0DuoWZiNcKa9d7AgqArgplZXhH4McwIjOWbI8IwrG_jiuLkD9Cfrbj8NN7pf58mKqnd8f3rxWL3gj7rDD__p8vQgRFQUmGNBxc2qfecTDy4dpijB1TAvmQ7Ex';//snapshot.token;
     return fcm.sendToDevice(token, payload);
 });
 
