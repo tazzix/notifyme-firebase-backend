@@ -24,7 +24,7 @@ self.addEventListener('activate', function(event) {
   // the clients.
   return self.clients.claim();
 });
-
+/*
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
@@ -51,7 +51,7 @@ async function networkFirst(request) {
     return cachedResponse || await caches.match('./fallback.json');
   }
 }
-
+*/
 
 // Listner for Push Notification
 self.addEventListener('push', function (event) {
